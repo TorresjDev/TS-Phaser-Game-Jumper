@@ -6,10 +6,12 @@ export class GameOver extends Scene {
 	}
 
 	create(): void {
+		const { width, height } = this.scale;
+
 		this.cameras.main.setBackgroundColor(0xff0000);
-		this.add.image(512, 384, "background").setAlpha(0.5);
+		this.add.image(width / 2, height / 2, "background").setAlpha(0.5);
 		this.add
-			.text(512, 384, "Game Over", {
+			.text(width / 2, height * 0.5, "Game Over", {
 				fontFamily: "Arial Black",
 				fontSize: 64,
 				color: "#ffffff",
@@ -24,16 +26,19 @@ export class GameOver extends Scene {
 
 	private setupNavigation(): void {
 		const isMobile = this.sys.game.device.input.touch;
+		const { width, height } = this.scale;
 
 		if (isMobile) {
 			// For mobile: Create a dedicated "Restart" button to avoid accidental touches
+			const buttonY = height * 0.75;
+
 			const restartButton = this.add
-				.rectangle(512, 600, 300, 80, 0xe74c3c)
+				.rectangle(width / 2, buttonY, 300, 80, 0xe74c3c)
 				.setStrokeStyle(4, 0xffffff)
 				.setInteractive({ cursor: "pointer" });
 
 			this.add
-				.text(512, 600, "RESTART", {
+				.text(width / 2, buttonY, "RESTART", {
 					fontFamily: "Arial Black",
 					fontSize: 32,
 					color: "#ffffff",

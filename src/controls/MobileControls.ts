@@ -3,215 +3,169 @@ export class MobileControls {
 	private leftButton: Phaser.GameObjects.Graphics;
 	private rightButton: Phaser.GameObjects.Graphics;
 	private jumpButton: Phaser.GameObjects.Graphics;
+	
+	// State
 	private leftPressed: boolean = false;
 	private rightPressed: boolean = false;
 	private jumpPressed: boolean = false;
-	private activePointers: Set<number> = new Set();
+	
+	// Configuration
+	private readonly BUTTON_SIZE = 80;
+	private readonly MARGIN = 20;
+	private readonly BUTTON_COLOR = 0x444444;
+	private readonly BUTTON_ALPHA = 0.5;
+	private readonly BUTTON_PRESSED_COLOR = 0x666666;
+	private readonly BUTTON_PRESSED_ALPHA = 0.8;
 
 	constructor(scene: Phaser.Scene) {
 		this.scene = scene;
 		this.createControls();
 		this.setupInputHandlers();
+		
+		// Listen for resize events
+		this.scene.scale.on('resize', this.handleResize, this);
 	}
 
 	private createControls(): void {
-		const camera = this.scene.cameras.main;
-		const buttonSize = 80;
-		const margin = 20;
+		// Create graphics objects if they don't exist
+		if (!this.leftButton) this.leftButton = this.scene.add.graphics();
+		if (!this.rightButton) this.rightButton = this.scene.add.graphics();
+		if (!this.jumpButton) this.jumpButton = this.scene.add.graphics();
 
-		// Left button
-		this.leftButton = this.scene.add.graphics();
-		this.leftButton.fillStyle(0x444444, 0.7);
-		this.leftButton.fillRoundedRect(0, 0, buttonSize, buttonSize, 10);
-		this.leftButton.fillStyle(0xffffff, 0.8);
-		this.leftButton.fillTriangle(
-			buttonSize * 0.6,
-			buttonSize * 0.3,
-			buttonSize * 0.6,
-			buttonSize * 0.7,
-			buttonSize * 0.3,
-			buttonSize * 0.5
-		);
-		this.leftButton.setPosition(margin, camera.height - buttonSize - margin);
-		this.leftButton.setScrollFactor(0);
-		this.leftButton.setDepth(1000);
-		this.leftButton.setInteractive(
-			new Phaser.Geom.Rectangle(0, 0, buttonSize, buttonSize),
-			Phaser.Geom.Rectangle.Contains
-		);
+		// Set initial positions and draw
+		this.updateLayout();
 
-		// Right button
-		this.rightButton = this.scene.add.graphics();
-		this.rightButton.fillStyle(0x444444, 0.7);
-		this.rightButton.fillRoundedRect(0, 0, buttonSize, buttonSize, 10);
-		this.rightButton.fillStyle(0xffffff, 0.8);
-		this.rightButton.fillTriangle(
-			buttonSize * 0.4,
-			buttonSize * 0.3,
-			buttonSize * 0.4,
-			buttonSize * 0.7,
-			buttonSize * 0.7,
-			buttonSize * 0.5
-		);
-		this.rightButton.setPosition(
-			margin + buttonSize + 10,
-			camera.height - buttonSize - margin
-		);
-		this.rightButton.setScrollFactor(0);
-		this.rightButton.setDepth(1000);
-		this.rightButton.setInteractive(
-			new Phaser.Geom.Rectangle(0, 0, buttonSize, buttonSize),
-			Phaser.Geom.Rectangle.Contains
-		);
+		// Set properties common to all buttons
+		[this.leftButton, this.rightButton, this.jumpButton].forEach(btn => {
+			btn.setScrollFactor(0);
+			btn.setDepth(1000);
+		});
+	}
 
-		// Jump button
-		this.jumpButton = this.scene.add.graphics();
-		this.jumpButton.fillStyle(0x444444, 0.7);
-		this.jumpButton.fillRoundedRect(0, 0, buttonSize, buttonSize, 10);
-		this.jumpButton.fillStyle(0xffffff, 0.8);
-		// this.jumpButton.fillText("↑", buttonSize / 2, buttonSize / 2);
-		this.jumpButton.setPosition(
-			camera.width - buttonSize - margin,
-			camera.height - buttonSize - margin
-		);
-		this.jumpButton.setScrollFactor(0);
-		this.jumpButton.setDepth(1000);
-		this.jumpButton.setInteractive(
-			new Phaser.Geom.Rectangle(0, 0, buttonSize, buttonSize),
-			Phaser.Geom.Rectangle.Contains
-		);
+	private updateLayout(): void {
+		const { width, height } = this.scene.scale;
+		
+		// Position Left settings
+		const leftX = this.MARGIN;
+		const leftY = height - this.BUTTON_SIZE - this.MARGIN;
+		
+		// Position Right settings
+		const rightX = this.MARGIN + this.BUTTON_SIZE + 10;
+		const rightY = height - this.BUTTON_SIZE - this.MARGIN;
+
+		// Position Jump settings
+		const jumpX = width - this.BUTTON_SIZE - this.MARGIN;
+		const jumpY = height - this.BUTTON_SIZE - this.MARGIN;
+
+		// Draw logic
+		this.drawButton(this.leftButton, leftX, leftY, this.leftPressed, 'left');
+		this.drawButton(this.rightButton, rightX, rightY, this.rightPressed, 'right');
+		this.drawButton(this.jumpButton, jumpX, jumpY, this.jumpPressed, 'jump');
+
+		// Update hit areas
+		const shape = new Phaser.Geom.Rectangle(0, 0, this.BUTTON_SIZE, this.BUTTON_SIZE);
+		this.leftButton.setInteractive(shape, Phaser.Geom.Rectangle.Contains);
+		// Update position of hit area by setting the graphics active position
+		// Note: Graphics.setPosition moves the whole graphics context.
+		this.leftButton.setPosition(leftX, leftY);
+		
+		this.rightButton.setInteractive(shape, Phaser.Geom.Rectangle.Contains);
+		this.rightButton.setPosition(rightX, rightY);
+		
+		this.jumpButton.setInteractive(shape, Phaser.Geom.Rectangle.Contains);
+		this.jumpButton.setPosition(jumpX, jumpY);
+	}
+
+	private drawButton(
+		graphics: Phaser.GameObjects.Graphics, 
+		x: number, // x and y are not used for drawing relative to 0,0 of the graphics object
+		y: number, 
+		isPressed: boolean, 
+		type: 'left' | 'right' | 'jump'
+	): void {
+		graphics.clear();
+
+		// Background
+		graphics.fillStyle(isPressed ? this.BUTTON_PRESSED_COLOR : this.BUTTON_COLOR, isPressed ? this.BUTTON_PRESSED_ALPHA : this.BUTTON_ALPHA);
+		graphics.fillRoundedRect(0, 0, this.BUTTON_SIZE, this.BUTTON_SIZE, 10);
+
+		// Icon
+		graphics.fillStyle(0xffffff, 0.9);
+		
+		const cx = this.BUTTON_SIZE / 2;
+		const cy = this.BUTTON_SIZE / 2;
+		const arrowSize = this.BUTTON_SIZE * 0.4;
+
+		if (type === 'left') {
+			graphics.fillTriangle(
+				cx + arrowSize * 0.3, cy - arrowSize * 0.5,
+				cx + arrowSize * 0.3, cy + arrowSize * 0.5,
+				cx - arrowSize * 0.4, cy
+			);
+		} else if (type === 'right') {
+			graphics.fillTriangle(
+				cx - arrowSize * 0.3, cy - arrowSize * 0.5,
+				cx - arrowSize * 0.3, cy + arrowSize * 0.5,
+				cx + arrowSize * 0.4, cy
+			);
+		} else if (type === 'jump') {
+			// Up arrow
+			graphics.fillTriangle(
+				cx - arrowSize * 0.5, cy + arrowSize * 0.3,
+				cx + arrowSize * 0.5, cy + arrowSize * 0.3,
+				cx, cy - arrowSize * 0.4
+			);
+		}
 	}
 
 	private setupInputHandlers(): void {
-		// Enable multi-touch
-		this.scene.input.addPointer(2); // Allow up to 3 simultaneous touches
-
-		// Left button handlers
-		this.leftButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+		// Use a helper to clean up repetitive code
+		this.bindButtonEvents(this.leftButton, () => {
 			this.leftPressed = true;
-			this.activePointers.add(pointer.id);
-			this.updateButtonState(this.leftButton, true);
-		});
-
-		this.leftButton.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+			this.leftButton.clear(); // Clear before redraw
+			this.updateLayout(); // Or just redraw specific button for perf, but layout is cheap here
+		}, () => {
 			this.leftPressed = false;
-			this.activePointers.delete(pointer.id);
-			this.updateButtonState(this.leftButton, false);
+			this.updateLayout();
 		});
 
-		this.leftButton.on("pointerout", (pointer: Phaser.Input.Pointer) => {
-			this.leftPressed = false;
-			this.activePointers.delete(pointer.id);
-			this.updateButtonState(this.leftButton, false);
-		});
-
-		// Right button handlers
-		this.rightButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+		this.bindButtonEvents(this.rightButton, () => {
 			this.rightPressed = true;
-			this.activePointers.add(pointer.id);
-			this.updateButtonState(this.rightButton, true);
-		});
-
-		this.rightButton.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+			this.updateLayout();
+		}, () => {
 			this.rightPressed = false;
-			this.activePointers.delete(pointer.id);
-			this.updateButtonState(this.rightButton, false);
+			this.updateLayout();
 		});
 
-		this.rightButton.on("pointerout", (pointer: Phaser.Input.Pointer) => {
-			this.rightPressed = false;
-			this.activePointers.delete(pointer.id);
-			this.updateButtonState(this.rightButton, false);
-		});
-
-		// Jump button handlers
-		this.jumpButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+		this.bindButtonEvents(this.jumpButton, () => {
 			this.jumpPressed = true;
-			this.activePointers.add(pointer.id);
-			this.updateButtonState(this.jumpButton, true);
-		});
-
-		this.jumpButton.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+			this.updateLayout();
+		}, () => {
 			this.jumpPressed = false;
-			this.activePointers.delete(pointer.id);
-			this.updateButtonState(this.jumpButton, false);
-		});
-
-		this.jumpButton.on("pointerout", (pointer: Phaser.Input.Pointer) => {
-			this.jumpPressed = false;
-			this.activePointers.delete(pointer.id);
-			this.updateButtonState(this.jumpButton, false);
+			this.updateLayout();
 		});
 	}
 
-	private updateButtonState(
-		button: Phaser.GameObjects.Graphics,
-		pressed: boolean
-	): void {
-		button.clear();
-		const buttonSize = 80;
-
-		if (pressed) {
-			button.fillStyle(0x666666, 0.9);
-			button.fillRoundedRect(0, 0, buttonSize, buttonSize, 10);
-		} else {
-			button.fillStyle(0x444444, 0.7);
-			button.fillRoundedRect(0, 0, buttonSize, buttonSize, 10);
-		}
-
-		// Redraw button content based on which button it is
-		button.fillStyle(0xffffff, 0.8);
-
-		if (button === this.leftButton) {
-			button.fillTriangle(
-				buttonSize * 0.6,
-				buttonSize * 0.3,
-				buttonSize * 0.6,
-				buttonSize * 0.7,
-				buttonSize * 0.3,
-				buttonSize * 0.5
-			);
-		} else if (button === this.rightButton) {
-			button.fillTriangle(
-				buttonSize * 0.4,
-				buttonSize * 0.3,
-				buttonSize * 0.4,
-				buttonSize * 0.7,
-				buttonSize * 0.7,
-				buttonSize * 0.5
-			);
-		} else if (button === this.jumpButton) {
-			// For jump button, you might want to use text or a different shape
-			const style = { fontSize: "32px", fill: "#ffffff" };
-			const text = this.scene.add.text(
-				buttonSize / 2,
-				buttonSize / 2,
-				"↑",
-				style
-			);
-			text.setOrigin(0.5);
-			text.setPosition(button.x + buttonSize / 2, button.y + buttonSize / 2);
-			text.setScrollFactor(0);
-			text.setDepth(1001);
-		}
+	private bindButtonEvents(gameObj: Phaser.GameObjects.GameObject, onDown: () => void, onUp: () => void): void {
+		gameObj.on('pointerdown', onDown);
+		gameObj.on('pointerup', onUp);
+		gameObj.on('pointerout', onUp); // Treat leaving the button as releasing it
 	}
 
-	public isLeftPressed(): boolean {
-		return this.leftPressed;
+	private handleResize(gameSize: Phaser.Structs.Size): void {
+		this.updateLayout();
 	}
 
-	public isRightPressed(): boolean {
-		return this.rightPressed;
-	}
-
-	public isJumpPressed(): boolean {
-		return this.jumpPressed;
-	}
+	// Public API for Game Scene
+	public get isLeft(): boolean { return this.leftPressed; }
+	public get isRight(): boolean { return this.rightPressed; }
+	public get isJump(): boolean { return this.jumpPressed; }
 
 	public destroy(): void {
+		this.scene.scale.off('resize', this.handleResize, this);
 		this.leftButton.destroy();
 		this.rightButton.destroy();
 		this.jumpButton.destroy();
-		this.activePointers.clear();
 	}
 }
+

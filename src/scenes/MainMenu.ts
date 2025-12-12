@@ -6,10 +6,22 @@ export class MainMenu extends Scene {
 	}
 
 	create(): void {
-		this.add.image(512, 384, "background");
-		this.add.image(512, 350, "logo").setScale(0.3);
+		const { width, height } = this.scale;
+
+		// Background - centered and scaled to cover if needed, or just placed
+		const bg = this.add.image(width / 2, height / 2, "background");
+		// Simple cover logic if we want responsiveness
+		const scaleX = width / bg.width;
+		const scaleY = height / bg.height;
+		const scale = Math.max(scaleX, scaleY);
+		bg.setScale(scale).setScrollFactor(0);
+
+		// Logo
+		this.add.image(width / 2, height * 0.4, "logo").setScale(0.3);
+
+		// Title Text
 		this.add
-			.text(512, 510, "CLICK TO START", {
+			.text(width / 2, height * 0.6, "CLICK TO START", {
 				fontFamily: "Arial Black",
 				fontSize: 38,
 				color: "#ffffff",
@@ -24,16 +36,19 @@ export class MainMenu extends Scene {
 
 	private setupNavigation(): void {
 		const isMobile = this.sys.game.device.input.touch;
+		const { width, height } = this.scale;
 
 		if (isMobile) {
-			// For mobile: Create a dedicated "Start Game" button to avoid accidental touches
+			// For mobile: Create a dedicated "Start Game" button
+			const buttonY = height * 0.75;
+			
 			const startButton = this.add
-				.rectangle(512, 600, 300, 80, 0x4a90e2)
+				.rectangle(width / 2, buttonY, 300, 80, 0x4a90e2)
 				.setStrokeStyle(4, 0xffffff)
 				.setInteractive({ cursor: "pointer" });
 
 			this.add
-				.text(512, 600, "START GAME", {
+				.text(width / 2, buttonY, "START GAME", {
 					fontFamily: "Arial Black",
 					fontSize: 32,
 					color: "#ffffff",
