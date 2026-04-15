@@ -1,97 +1,140 @@
-# 🎮 Jumper - TypeScript Phaser 3 Platformer
+# Jumper: TypeScript Phaser Sandbox
 
 ![GitHub Pages Deploy](https://github.com/TorresjDev/TS-Phaser-Game-Jumper/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Phaser](https://img.shields.io/badge/Phaser-3.80.1-orange.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-Latest-3178C6.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18-43853d.svg)
+![Phaser](https://img.shields.io/badge/Phaser-3.90.0-orange.svg)
 
-## 🎮 [**PLAY GAME NOW!**](https://torresjdev.github.io/TS-Phaser-Game-Jumper/) 🚀
+A clone-and-go Phaser 3 + TypeScript game starter built around a real playable platformer.
+
+Play the live game on GitHub Pages: [Jumper Live](https://torresjdev.github.io/TS-Phaser-Game-Jumper/)
 
 ![Game Logo](/public/assets/images/ui/jumper-title.png)
 
-## ✨ Overview
+## Why this repo exists
 
-**Jumper** is a modern, responsive platformer built with **Phaser 3** and **TypeScript**. It features classic arcade mechanics, professional code architecture, and a polished user experience across all devices.
+This project is both:
 
-### 🆕 New Features (v3.1)
-- 📱 **Mobile-First Controls**: Responsive on-screen touch controls with multi-touch support.
-- 📐 **Responsive Design**: Game scales intelligently to fit any screen size (Desktop, Tablet, Mobile).
-- 💣 **Enhanced Physics**: Improved bomb collision logic using native physics for fair and predictable gameplay.
-- 🎨 **UI Polish**: Clean, relative positioning for menus and game over screens.
+- a polished platformer you can play right away
+- an open-source sandbox for developers to quickly build and ship Phaser games with TypeScript
 
----
+The architecture is intentionally straightforward so contributors can jump in fast.
 
-## 🎮 Gameplay Features
+## Quick start (60 seconds)
 
-- **Core Mechanics**: Precise jumping, coin collection, and score tracking.
-- **Dynamic World**:
-    - **Pac-Man Wrapping**: Player and bombs wrap horizontally.
-    - **Smart Boundaries**: Bombs bounce naturally off the floor and ceiling.
-- **Progressive Difficulty**: Intelligent bomb spawning and bouncing mechanics.
+```bash
+git clone https://github.com/TorresjDev/TS-Phaser-Game-Jumper.git
+cd TS-Phaser-Game-Jumper
+npm install
+npm start
+```
 
----
+The dev server starts on `http://localhost:8081`.
 
-## 🏗️ Tech Stack
+## Scripts
 
-- **Engine**: Phaser 3.80.1 (Arcade Physics)
-- **Language**: TypeScript
-- **Bundler**: Webpack 5
-- **CI/CD**: GitHub Actions (Auto-deploy to GitHub Pages)
+- `npm start`: run the dev server on port `8081`
+- `npm run dev`: run the default webpack dev server config
+- `npm run build`: create production build in `dist/`
+- `npm run typecheck`: run TypeScript checks with no emit
+- `npm run lint`: lint TypeScript files
+- `npm run lint:fix`: lint and auto-fix where possible
+- `npm run format`: check formatting with Prettier
+- `npm run format:fix`: apply Prettier formatting
 
----
+## Tech stack
 
-## 🚀 Quick Start
+- Phaser `3.90.x`
+- TypeScript `5.9.x`
+- Webpack `5.x`
+- ESLint + Prettier
+- GitHub Actions + GitHub Pages
 
-### Prerequisites
-- **Node.js** 18+
-- **npm** or **yarn**
+## Project structure
 
-### Setup
-1. **Clone & Install**:
-   ```bash
-   git clone https://github.com/TorresjDev/TS-Phaser-Game-Jumper.git
-   cd TS-Phaser-Game-Jumper
-   npm install
-   ```
+```text
+src/
+  config/
+    leaderboard.ts
+    settings.ts
+  controls/
+    MobileControls.ts
+  scenes/
+    Boot.ts
+    Preloader.ts
+    MainMenu.ts
+    Leaderboard.ts
+    Game.ts
+    GameOver.ts
+  main.ts
+public/
+  assets/
+webpack/
+  config.js
+  config.prod.js
+```
 
-2. **Run Dev Server**:
-   ```bash
-   npm start
-   ```
-   Opens at `http://localhost:8081`
+For a deeper walkthrough, see `docs/ARCHITECTURE.md`.
 
-3. **Build for Production**:
-   ```bash
-   npm run build
-   ```
-
----
-
-## 🎯 Controls
+## Controls
 
 | Device | Action | Input |
 | :--- | :--- | :--- |
-| **Desktop** | **Move** | `←` `→` Arrows |
-| | **Jump** | `↑` Arrow |
-| **Mobile** | **Move** | On-screen Left/Right Buttons |
-| | **Jump** | On-screen Jump Button |
+| Desktop | Move | `Left` / `Right` arrows |
+| Desktop | Move (alt) | `A` / `D` |
+| Desktop | Jump | `Up` arrow / `W` / `Space` |
+| Mobile | Move | On-screen left/right buttons |
+| Mobile | Jump | On-screen jump button |
 
----
+## How to play
 
-## 🤝 Contributing
+- Move with `Left/Right` or `A/D`.
+- Jump with `Up`, `W`, or `Space`.
+- Avoid touching bombs; each hit costs one life (unless using unlimited lives mode).
+- Collect coins before time runs out.
+- Each coin adds `+3s` to the timer.
+- Pause anytime to adjust edge wrap, volume, and starting lives.
 
-1. **Fork** the repo.
-2. **Branch**: `git checkout -b feature/amazing-feature`
-3. **Commit**: `git commit -m "feat: add amazing feature"`
-4. **Push**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**.
+## Gameplay essentials included
 
----
+- configurable lives (`1`, `3`, `5`, `Unlimited`)
+- persistent best-score tracking in local storage
+- edge-wrap option (toggle in Settings)
+- in-game pause menu with live settings updates
+- in-game pause actions (resume, restart, return to menu)
+- countdown gameplay loop with time pressure
+- coin collection adds `+3s` per coin
+- local top-score leaderboard with 3-character initials entry and timestamps
+- dedicated leaderboard page + quick access from game over
+- adjustable volume slider in menu and pause settings
+- damage feedback flash effect on bomb hit
 
-<div align="center">
+## Deployment
 
-**[LAUNCH GAME →](https://torresjdev.github.io/TS-Phaser-Game-Jumper/)**
+Deployment is automated with GitHub Actions:
 
-_Built with ❤️ by [TorresjDev](https://github.com/TorresjDev)_
+- push to `main`
+- workflow builds the project
+- `dist/` is published to GitHub Pages
 
-</div>
+Important: production webpack config uses:
+
+- `output.publicPath = "/TS-Phaser-Game-Jumper/"`
+
+If you fork and rename the repository, update that value in `webpack/config.prod.js`.
+
+## Contributing
+
+Contributions are welcome. Start with:
+
+- `CONTRIBUTING.md` for workflow and PR checks
+- `CODE_OF_CONDUCT.md` for community expectations
+- `SECURITY.md` for responsible reporting
+
+## Changelog
+
+Release notes live in `CHANGELOG.md`.
+
+## License
+
+MIT. See `LICENSE`.

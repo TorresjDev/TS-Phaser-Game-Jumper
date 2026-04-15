@@ -17,7 +17,7 @@ export class Preloader extends Scene {
 		// Optional: Add progress bar fill logic here if desired later
 		// const bar = this.add.rectangle(width / 2 - barWidth / 2 + 2, height / 2, 4, barHeight - 4, 0xffffff);
 		
-		this.load.on('progress', (progress: number) => {
+		this.load.on('progress', () => {
 			// Update bar width based on progress
 			// bar.width = (barWidth - 4) * progress;
 		});
