@@ -1,8 +1,8 @@
 export class MobileControls {
 	private scene: Phaser.Scene;
-	private leftButton: Phaser.GameObjects.Graphics;
-	private rightButton: Phaser.GameObjects.Graphics;
-	private jumpButton: Phaser.GameObjects.Graphics;
+	private leftButton!: Phaser.GameObjects.Graphics;
+	private rightButton!: Phaser.GameObjects.Graphics;
+	private jumpButton!: Phaser.GameObjects.Graphics;
 	
 	// State
 	private leftPressed: boolean = false;
@@ -58,9 +58,9 @@ export class MobileControls {
 		const jumpY = height - this.BUTTON_SIZE - this.MARGIN;
 
 		// Draw logic
-		this.drawButton(this.leftButton, leftX, leftY, this.leftPressed, 'left');
-		this.drawButton(this.rightButton, rightX, rightY, this.rightPressed, 'right');
-		this.drawButton(this.jumpButton, jumpX, jumpY, this.jumpPressed, 'jump');
+		this.drawButton(this.leftButton, this.leftPressed, 'left');
+		this.drawButton(this.rightButton, this.rightPressed, 'right');
+		this.drawButton(this.jumpButton, this.jumpPressed, 'jump');
 
 		// Update hit areas
 		const shape = new Phaser.Geom.Rectangle(0, 0, this.BUTTON_SIZE, this.BUTTON_SIZE);
@@ -78,8 +78,6 @@ export class MobileControls {
 
 	private drawButton(
 		graphics: Phaser.GameObjects.Graphics, 
-		x: number, // x and y are not used for drawing relative to 0,0 of the graphics object
-		y: number, 
 		isPressed: boolean, 
 		type: 'left' | 'right' | 'jump'
 	): void {
@@ -152,7 +150,7 @@ export class MobileControls {
 		gameObj.on('pointerout', onUp); // Treat leaving the button as releasing it
 	}
 
-	private handleResize(gameSize: Phaser.Structs.Size): void {
+	private handleResize(): void {
 		this.updateLayout();
 	}
 
