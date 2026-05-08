@@ -1,6 +1,7 @@
 import { Boot } from "./scenes/Boot";
 import { Game } from "./scenes/Game";
 import { GameOver } from "./scenes/GameOver";
+import { Leaderboard } from "./scenes/Leaderboard";
 import { MainMenu } from "./scenes/MainMenu";
 import { Preloader } from "./scenes/Preloader";
 
@@ -23,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: false,
 		},
 	},
-	scene: [Boot, Preloader, MainMenu, Game, GameOver],
+	scene: [Boot, Preloader, MainMenu, Leaderboard, Game, GameOver],
 };
 
 export default new Phaser.Game(config);
